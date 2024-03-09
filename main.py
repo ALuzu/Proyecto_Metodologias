@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from datetime import datetime
 
+import psycopg2
+
 class Transaccion:
     def __init__(self, fecha, monto, tipo_transaccion, categoria, metodo_pago, descripcion):
         self.fecha = fecha
@@ -85,11 +87,26 @@ class InterfazUsuario(tk.Tk):
         boton_registrar = tk.Button(ventana_transaccion, text="Registrar", command=lambda: self.registrar_entrada(entry_fecha.get(), entry_monto.get(), seleccion_tipo.get(), entry_categoria.get(), entry_metodo_pago.get(), entry_descripcion.get(), ventana_transaccion))
         boton_registrar.grid(row=6, columnspan=2, pady=5)
 
-    def registrar_entrada(self, fecha, monto, tipo, categoria, metodo_pago, descripcion, ventana):
+    def registrar_entrada(self, fecha, monto, tipo, categoria, metodoPago, descripcion, ventana):
         try:
             datetime.strptime(fecha, "%d/%m/%Y")
             monto = float(monto)
-            nueva_transaccion = Transaccion(fecha, monto, tipo, categoria, metodo_pago, descripcion)
+            nueva_transaccion = Transaccion(fecha, monto, tipo, categoria, metodoPago, descripcion)
+
+            # Conectar a la base de datos
+            conexion = conectar_db()
+            cursor = conexion.cursor()
+
+            # Insertar la transacción en la tabla
+            cursor.execute("""
+                INSERT INTO historial (Fecha, Monto, Tipo, categoria, MetodoPago, Descripcion)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (fecha, monto, tipo, categoria, metodoPago, descripcion))
+
+            # Guardar los cambios y cerrar la conexión
+            conexion.commit()
+            conexion.close()
+
             self.administrador_transacciones.agregar_transaccion(nueva_transaccion)
             self.actualizar_monto_total()
             messagebox.showinfo("Éxito", "Transacción registrada correctamente")
@@ -131,6 +148,16 @@ class InterfazUsuario(tk.Tk):
 
         etiqueta_total = tk.Label(historial_window, text=f"Monto Total: {self.administrador_transacciones.monto_total}")
         etiqueta_total.pack(side="bottom", pady=5)
+
+def conectar_db():
+    conexion = psycopg2.connect(
+        database="historial",
+        user="postgres",
+        password="arlj2002",
+        host="localhost",
+        port="5432",
+    )
+    return conexion
 
 def main():
     administrador_transacciones = AdministradorTransacciones()
