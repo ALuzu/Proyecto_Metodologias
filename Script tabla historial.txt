@@ -1,0 +1,8 @@
+CREATE TABLE historial (
+    Fecha DATE,
+    Monto NUMERIC,
+    Tipo VARCHAR(10),
+    categoria VARCHAR(50),
+    MetodoPago VARCHAR(50),
+    Descripcion TEXT
+);
