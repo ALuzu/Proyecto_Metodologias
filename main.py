@@ -46,6 +46,7 @@ class InterfazUsuario(tk.Tk):
         self.boton_historial = tk.Button(self, text="Ver Historial de Transacciones", command=self.ver_historial)
         self.boton_historial.pack(pady=5)
 
+
     def registrar_transaccion(self):
         ventana_transaccion = tk.Toplevel(self)
         ventana_transaccion.title("Registrar Transacción")
@@ -99,8 +100,9 @@ class InterfazUsuario(tk.Tk):
 
             # Insertar la transacción en la tabla
             cursor.execute("""
-                INSERT INTO historial (Fecha, Monto, Tipo, categoria, MetodoPago, Descripcion)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO historial (Fecha, Monto, Tipo, Categoria, MetodoPago, Descripcion)
+                VALUES ((%s, %s, %s, %s, %s, %s)
+
             """, (fecha, monto, tipo, categoria, metodoPago, descripcion))
 
             # Guardar los cambios y cerrar la conexión
@@ -153,9 +155,9 @@ def conectar_db():
     conexion = psycopg2.connect(
         database="historial",
         user="postgres",
-        password="arlj2002",
+        password="12345678",
         host="localhost",
-        port="5432",
+        port="5434",
     )
     return conexion
 
