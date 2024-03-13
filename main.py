@@ -101,7 +101,7 @@ class InterfazUsuario(tk.Tk):
             # Insertar la transacción en la tabla
             cursor.execute("""
                 INSERT INTO historial (Fecha, Monto, Tipo, Categoria, MetodoPago, Descripcion)
-                VALUES ((%s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s)
 
             """, (fecha, monto, tipo, categoria, metodoPago, descripcion))
 
@@ -152,14 +152,19 @@ class InterfazUsuario(tk.Tk):
         etiqueta_total.pack(side="bottom", pady=5)
 
 def conectar_db():
-    conexion = psycopg2.connect(
-        database="historial",
-        user="postgres",
-        password="12345678",
-        host="localhost",
-        port="5434",
-    )
-    return conexion
+    try:
+        conexion = psycopg2.connect(
+            host="localhost",
+            user="postgres",
+            password="123456789",
+            database="postgres",
+            port="5432",
+        )
+        return conexion
+    except psycopg2.OperationalError as e:
+        print("Error de conexión:", e)
+        return None
+
 
 def main():
     administrador_transacciones = AdministradorTransacciones()
@@ -168,4 +173,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
